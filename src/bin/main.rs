@@ -8,7 +8,7 @@ use std::io::prelude::*;
 use std::net::TcpStream;
 use std::net::TcpListener;
 
-use hello::ThreadPool;
+use web_server::ThreadPool;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
@@ -16,16 +16,17 @@ fn main() {
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
-        
+
         pool.execute(|| {
             handle_connection(stream);
         });
     }
+
+    println!("Shutting down.");
 }
 
 fn handle_connection(mut stream: TcpStream) {
-    let mut buffer = [0; 512];
-
+    let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
 
     lazy_static! {

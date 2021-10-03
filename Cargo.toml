@@ -1,5 +1,5 @@
 [package]
-name = "hello"
+name = "web_server"
 version = "0.1.0"
 edition = "2018"
 
