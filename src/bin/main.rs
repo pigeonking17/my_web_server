@@ -1,9 +1,8 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::thread;
-use std::time::Duration;
 use std::str;
 use std::fs;
+use std::path::Path;
 use std::io::prelude::*;
 use std::net::TcpStream;
 use std::net::TcpListener;
@@ -41,17 +40,18 @@ fn handle_connection(mut stream: TcpStream) {
 
     match request_file {
         "/" => {
-            let contents = fs::read_to_string("hello.html").unwrap();
-            response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
-        }
-        "/sleep" => {
-            thread::sleep(Duration::from_secs(5));
-            let contents = fs::read_to_string("hello.html").unwrap();
+            let contents = fs::read_to_string("files/index.html").unwrap();
             response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
         }
         _ => {
-            let contents = fs::read_to_string("404.html").unwrap();
-            response = format!("HTTP/1.1 404 NOT FOUND\r\n\r\n{}", contents);
+            let path = format!("./files{}", request_file);
+            let path = Path::new(path.as_str());
+            if let Ok(contents) = fs::read_to_string(path) {
+                response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
+            } else {
+                let contents = fs::read_to_string("files/404.html").unwrap();
+                response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
+            }
         }
     }
 
